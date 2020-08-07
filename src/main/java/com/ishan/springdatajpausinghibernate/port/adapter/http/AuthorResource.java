@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,7 +18,13 @@ public class AuthorResource {
   @GetMapping("/authors")
   public ResponseEntity<List<Author>> getAuthors() {
     return
-        ResponseEntity.ok(authorApplicationService.getAllAuthorsUsingNamedEntityGraph());
+        ResponseEntity.ok(authorApplicationService.getAllAuthors());
+  }
+
+  @GetMapping("/authors/name")
+  public ResponseEntity<List<Author>> getAuthorsByName(@RequestBody String name) {
+    return
+        ResponseEntity.ok(authorApplicationService.getAuthorsByName(name));
   }
 
 }

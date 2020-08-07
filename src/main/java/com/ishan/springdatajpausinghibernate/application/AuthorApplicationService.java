@@ -1,47 +1,31 @@
 package com.ishan.springdatajpausinghibernate.application;
 
 import com.ishan.springdatajpausinghibernate.domain.Author;
+import com.ishan.springdatajpausinghibernate.domain.AuthorRepository;
 import java.util.List;
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthorApplicationService {
 
-  @PersistenceContext
-  private EntityManager em;
+  @Autowired
+  private AuthorRepository authorRepository;
 
   @Transactional
-  /**
-   * Re-create the N+1 select issue
-   * Lazy fetching of related entities creates too many queries
-   *
-   */
   public List<Author> getAllAuthors() {
-    Query query = em
-        .createQuery("select a from Author a");
-    //N+1 select issue
-    List<Author> authors = query.getResultList();
-    return authors;
+    return authorRepository.getAllAuthors();
   }
 
   @Transactional
-  /**
-   * Use NamedEntityGraphs to solve the issue
-   */
   public List<Author> getAllAuthorsUsingNamedEntityGraph() {
-    EntityGraph<?> graph = em.getEntityGraph("author.books");
-    Query query = em
-        .createQuery("select a from Author a")
-        .setHint("javax.persistence.loadgraph", graph);
+    return authorRepository.getAllAuthorsUsingNamedEntityGraph();
+  }
 
-    //Only 1 query will be fired to get all authors & their books!
-    List<Author> authors = query.getResultList();
-    return authors;
+  @Transactional
+  public List<Author> getAuthorsByName(String name) {
+    return authorRepository.getAuthorByNameUsingNamedEntityGraph(name);
   }
 
 }
